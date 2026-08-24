@@ -1,0 +1,33 @@
+{% load static %}<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}営業機会アラートツール{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+  <div class="navbar">
+    <a class="brand" href="{% url 'dashboard:index' %}">営業機会アラートツール</a>
+    {% if user.is_authenticated %}
+    <nav>
+      <a href="{% url 'dashboard:index' %}">ダッシュボード</a>
+      <a href="{% url 'companies:list' %}">企業一覧</a>
+      <a href="{% url 'companies:csv_upload' %}">CSV登録</a>
+      <a href="{% url 'accounts:settings_account' %}">設定</a>
+      <a href="{% url 'accounts:logout' %}">ログアウト（{{ user.name }}）</a>
+    </nav>
+    {% endif %}
+  </div>
+  <div class="container">
+    {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

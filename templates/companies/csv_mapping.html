@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load dict_extras %}
+{% block title %}CSV列マッピング確認 - 営業機会アラートツール{% endblock %}
+{% block content %}
+<div class="card" style="max-width:640px;">
+  <h1>列マッピングの確認</h1>
+  <p class="muted">「{{ original_filename }}」（{{ row_count }}件）を読み込みました。各項目に対応するCSVの列を確認・選択してください。</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="confirm_mapping" value="1">
+    <input type="hidden" name="csv_b64" value="{{ csv_b64 }}">
+    <input type="hidden" name="original_filename" value="{{ original_filename }}">
+
+    {% for field in field_defs %}
+    <div class="field">
+      <label>この列を「{{ field.1 }}」として使用{% if field.2 %} <span style="color:#c0392b">*</span>{% endif %}</label>
+      <select name="map_{{ field.0 }}" {% if field.2 %}required{% endif %}>
+        <option value="">（使用しない）</option>
+        {% for h in header %}
+        <option value="{{ h }}" {% if guesses|get_item:field.0 == h %}selected{% endif %}>{{ h }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% endfor %}
+
+    <div class="field">
+      <label>重複企業（HPドメイン一致）が見つかった場合</label>
+      <select name="duplicate_policy">
+        {% for value, label in duplicate_policy_choices %}
+        <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn">この内容で登録する</button>
+    <a href="{% url 'companies:csv_upload' %}" class="btn btn-secondary">やり直す</a>
+  </form>
+</div>
+{% endblock %}

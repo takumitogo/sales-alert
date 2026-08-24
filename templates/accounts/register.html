@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}ユーザー登録 - 営業機会アラートツール{% endblock %}
+{% block content %}
+<div class="card" style="max-width:520px;margin:40px auto;">
+  <h1>ユーザー登録</h1>
+  <p class="muted">失注企業・過去取引企業・長期未接触企業などを登録し、営業につながる新しい公開情報を見逃さないようにします。</p>
+  <form method="post">
+    {% csrf_token %}
+    {% include "_form_fields.html" %}
+    <button type="submit" class="btn">登録する</button>
+  </form>
+  <p class="muted" style="margin-top:16px;">既にアカウントをお持ちの方は <a href="{% url 'accounts:login' %}">ログイン</a></p>
+</div>
+{% endblock %}

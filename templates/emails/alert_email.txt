@@ -1,0 +1,30 @@
+{{ company.company_name }}について、新しい公開情報を検知しました。
+
+■企業名
+{{ company.company_name }}
+
+■検知情報
+{{ document.title }}
+
+■公開日
+{% if document.published_at %}{{ document.published_at|date:"Y年n月j日" }}{% else %}不明{% endif %}
+
+■検知キーワード
+{% for kw in matched_keywords %}{{ kw.keyword }}
+{% empty %}(該当キーワードなし・情報ソース/鮮度加点のみ){% endfor %}
+■営業機会スコア
+{{ alert.score }}点
+
+■情報ソース
+{{ company.company_name }} {{ source_type_label }}
+
+■詳細
+{{ document.url }}
+
+■過去商談情報
+区分：{{ category_label }}
+失注理由：{{ company.lost_reason|default:"（未登録）" }}
+最終接触日：{% if company.last_contact_date %}{{ company.last_contact_date|date:"Y年n月j日" }}{% else %}（未登録）{% endif %}
+
+■管理画面
+{{ admin_url }}

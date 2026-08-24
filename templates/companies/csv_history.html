@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}設定（CSV登録履歴） - 営業機会アラートツール{% endblock %}
+{% block content %}
+<h1>設定</h1>
+{% include "accounts/_settings_tabs.html" with active="csv" %}
+
+<div class="card">
+  <h2>CSV登録履歴</h2>
+  <p><a href="{% url 'companies:csv_upload' %}" class="btn">新しいCSVをアップロード</a></p>
+  <table>
+    <thead><tr><th>ファイル名</th><th>状態</th><th>成功</th><th>重複</th><th>エラー</th><th>登録日時</th></tr></thead>
+    <tbody>
+      {% for batch in batches %}
+      <tr>
+        <td>{{ batch.original_filename }}</td>
+        <td>{{ batch.get_status_display }}</td>
+        <td>{{ batch.success_rows }}</td>
+        <td>{{ batch.duplicate_rows }}</td>
+        <td>{{ batch.error_rows }}</td>
+        <td>{{ batch.created_at|date:"Y-m-d H:i" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="muted">まだCSVアップロードの履歴がありません。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

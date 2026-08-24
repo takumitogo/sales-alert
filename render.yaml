@@ -1,0 +1,46 @@
+# Render Blueprint（技術設計書1章・4章の構成に対応）
+# 1) Web Service：Djangoアプリ本体
+# 2) Cron Job：週次でrun_weekly_scanを実行
+#
+# データベースはNeon等の外部サーバーレスPostgresを利用する想定のため、
+# ここではRenderのマネージドDBは定義していない（DATABASE_URLを環境変数で指定する）。
+services:
+  - type: web
+    name: oppradar-web
+    runtime: python
+    plan: starter
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: DATABASE_URL
+        sync: false
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false
+      - key: SITE_BASE_URL
+        sync: false
+
+  - type: cron
+    name: oppradar-weekly-scan
+    runtime: python
+    schedule: "0 18 * * 0" # 毎週日曜18:00 UTC = 月曜3:00 JST
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python manage.py run_weekly_scan"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: EMAIL_HOST_USER
+        sync: false
+      - key: EMAIL_HOST_PASSWORD
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false
+      - key: SITE_BASE_URL
+        sync: false

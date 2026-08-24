@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}CSV一括登録 - 営業機会アラートツール{% endblock %}
+{% block content %}
+<div class="card" style="max-width:560px;">
+  <h1>CSV一括登録</h1>
+  <p class="muted">
+    列名が「会社名」「企業名」「法人名」など完全一致していなくても、アップロード後の確認画面で
+    どの列をどの項目として使うか選択できます。
+  </p>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include "_form_fields.html" %}
+    <button type="submit" class="btn">アップロード</button>
+  </form>
+  <p class="muted" style="margin-top:16px;">必須列：企業名・企業HP URL　／　任意列：区分・過去提案商材・失注理由・最終接触日・担当者・メモ</p>
+</div>
+{% endblock %}

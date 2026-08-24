@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load dict_extras %}
+{% block title %}{{ company.company_name }} - 営業機会アラートツール{% endblock %}
+{% block content %}
+<h1>{{ company.company_name }}</h1>
+
+<div class="card">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+    <table style="max-width:520px;">
+      <tr><th style="width:140px;">HP</th><td><a href="{{ company.hp_url }}" target="_blank" rel="noopener">{{ company.hp_url }}</a></td></tr>
+      <tr><th>区分</th><td>{{ company.get_category_display }}</td></tr>
+      <tr><th>過去提案商材</th><td>{{ company.past_proposed_product|default:"-" }}</td></tr>
+      <tr><th>失注理由</th><td>{{ company.lost_reason|default:"-" }}</td></tr>
+      <tr><th>最終接触日</th><td>{{ company.last_contact_date|default:"-" }}</td></tr>
+      <tr><th>担当者</th><td>{{ company.assigned_rep|default:"-" }}</td></tr>
+      <tr><th>メモ</th><td>{{ company.memo|default:"-"|linebreaksbr }}</td></tr>
+      <tr><th>監視間隔</th><td>{{ company.scan_interval_days }}日ごと</td></tr>
+      <tr><th>直近スキャン</th><td>{{ company.last_scanned_at|default:"未実施" }}</td></tr>
+    </table>
+    <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+      <span>{% if company.monitoring_enabled %}<span class="badge badge-ok">監視ON</span>{% else %}<span class="badge badge-muted">監視OFF</span>{% endif %}</span>
+      <a href="{% url 'companies:edit' company.pk %}" class="btn btn-secondary btn-small">編集</a>
+      <form method="post" action="{% url 'companies:toggle_monitoring' company.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-secondary btn-small">
+          {% if company.monitoring_enabled %}監視を停止{% else %}監視を再開{% endif %}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>公開情報履歴</h2>
+  {% for doc in documents %}
+  <div class="timeline-item {% if doc.total_score >= 80 %}level-alert{% elif doc.total_score >= 60 %}level-watch{% endif %}">
+    <div style="display:flex; justify-content:space-between;">
+      <div>
+        <strong>{{ doc.first_detected_at|date:"Y/n/j" }}</strong>
+        <a href="{{ doc.url }}" target="_blank" rel="noopener">{{ doc.title }}</a>
+        <div class="muted">
+          {{ doc.get_source_type_display }}
+          {% if doc.published_at %} ／ 公開日 {{ doc.published_at|date:"Y/n/j" }}{% endif %}
+          {% if doc.matched_keywords %} ／ キーワード：{% for kw in doc.matched_keywords %}{{ kw.keyword }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}
+        </div>
+      </div>
+      <div style="text-align:right;">
+        {% if doc.total_score >= 80 %}<span class="badge badge-alert">{{ doc.total_score }}点</span>
+        {% elif doc.total_score >= 60 %}<span class="badge badge-watch">{{ doc.total_score }}点</span>
+        {% else %}<span class="badge badge-muted">{{ doc.total_score }}点</span>{% endif %}
+        <div style="margin-top:6px;">
+          <form method="post" action="{% url 'intel:feedback' doc.id %}" style="display:inline;">
+            {% csrf_token %}<input type="hidden" name="rating" value="useful">
+            <button type="submit" class="btn btn-small {% if user_feedback|get_item:doc.id == 'useful' %}btn{% else %}btn-secondary{% endif %}">👍</button>
+          </form>
+          <form method="post" action="{% url 'intel:feedback' doc.id %}" style="display:inline;">
+            {% csrf_token %}<input type="hidden" name="rating" value="not_useful">
+            <button type="submit" class="btn btn-small {% if user_feedback|get_item:doc.id == 'not_useful' %}btn{% else %}btn-secondary{% endif %}">👎</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p class="muted">まだ検知された公開情報はありません。定期実行が行われるとここに表示されます。</p>
+  {% endfor %}
+</div>
+{% endblock %}

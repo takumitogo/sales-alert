@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}設定（監視キーワード） - 営業機会アラートツール{% endblock %}
+{% block content %}
+<h1>設定</h1>
+{% include "accounts/_settings_tabs.html" with active="keywords" %}
+
+<div class="card">
+  <h2>キーワードを追加</h2>
+  <form method="post" style="display:flex; gap:10px; align-items:flex-end;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="add">
+    <div class="field" style="margin-bottom:0;">
+      <label>キーワード</label>
+      <input type="text" name="keyword" required>
+    </div>
+    <div class="field" style="margin-bottom:0; max-width:120px;">
+      <label>点数</label>
+      <input type="number" name="score" min="1" max="100" required>
+    </div>
+    <button type="submit" class="btn">追加</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>監視キーワード一覧（{{ keywords|length }}件）</h2>
+  <table>
+    <thead><tr><th>キーワード</th><th>点数</th><th>状態</th><th></th></tr></thead>
+    <tbody>
+      {% for kw in keywords %}
+      <tr>
+        <td>{{ kw.keyword }}</td>
+        <td>
+          <form method="post" style="display:flex; gap:6px;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_score">
+            <input type="hidden" name="keyword_id" value="{{ kw.id }}">
+            <input type="number" name="score" value="{{ kw.score }}" min="1" max="100" style="width:70px;">
+            <button type="submit" class="btn btn-small btn-secondary">更新</button>
+          </form>
+        </td>
+        <td>
+          {% if kw.enabled %}<span class="badge badge-ok">ON</span>{% else %}<span class="badge badge-muted">OFF</span>{% endif %}
+        </td>
+        <td style="display:flex; gap:6px;">
+          <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="toggle">
+            <input type="hidden" name="keyword_id" value="{{ kw.id }}">
+            <button type="submit" class="btn btn-small btn-secondary">{% if kw.enabled %}OFFにする{% else %}ONにする{% endif %}</button>
+          </form>
+          <form method="post" onsubmit="return confirm('削除しますか？');">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="keyword_id" value="{{ kw.id }}">
+            <button type="submit" class="btn btn-small btn-secondary">削除</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="muted">キーワードが登録されていません。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

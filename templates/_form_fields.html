@@ -1,0 +1,11 @@
+{% for field in form %}
+<div class="field">
+  <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span style="color:#c0392b">*</span>{% endif %}</label>
+  {{ field }}
+  {% if field.help_text %}<div class="muted">{{ field.help_text }}</div>{% endif %}
+  {% for error in field.errors %}<div class="muted" style="color:#c0392b">{{ error }}</div>{% endfor %}
+</div>
+{% endfor %}
+{% if form.non_field_errors %}
+<div class="muted" style="color:#c0392b">{{ form.non_field_errors }}</div>
+{% endif %}

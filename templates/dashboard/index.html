@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}ダッシュボード - 営業機会アラートツール{% endblock %}
+{% block content %}
+<h1>ダッシュボード</h1>
+
+<div class="stat-row">
+  <div class="stat-tile"><div class="value">{{ monitored_count }}</div><div class="label">監視企業数</div></div>
+  <div class="stat-tile"><div class="value">{{ week_doc_count }}</div><div class="label">今週の新着情報数</div></div>
+  <div class="stat-tile"><div class="value">{{ week_alert_count }}</div><div class="label">今週の80点以上アラート数</div></div>
+  <div class="stat-tile"><div class="value">{{ week_watch_count }}</div><div class="label">今週の60〜79点候補数</div></div>
+</div>
+
+<div class="card">
+  <h2>最近の営業機会アラート</h2>
+  <table>
+    <thead><tr><th>企業</th><th>スコア</th><th>検知内容</th><th>検知日</th></tr></thead>
+    <tbody>
+      {% for alert in recent_alerts %}
+      <tr>
+        <td><a href="{% url 'companies:detail' alert.company.pk %}">{{ alert.company.company_name }}</a></td>
+        <td>
+          {% if alert.alert_level == "alert" %}<span class="badge badge-alert">{{ alert.score }}</span>
+          {% else %}<span class="badge badge-watch">{{ alert.score }}</span>{% endif %}
+        </td>
+        <td>{{ alert.web_document.title|truncatechars:40 }}</td>
+        <td>{{ alert.created_at|date:"n/j" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4" class="muted">まだアラートはありません。企業を登録し、定期実行バッチが動くとここに表示されます。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

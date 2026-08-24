@@ -1,0 +1,6 @@
+<div class="tabs">
+  <a href="{% url 'accounts:settings_account' %}" class="{% if active == 'account' %}active{% endif %}">アカウント</a>
+  <a href="{% url 'accounts:settings_alerts' %}" class="{% if active == 'alerts' %}active{% endif %}">アラート</a>
+  <a href="{% url 'intel:settings_keywords' %}" class="{% if active == 'keywords' %}active{% endif %}">監視キーワード</a>
+  <a href="{% url 'companies:csv_history' %}" class="{% if active == 'csv' %}active{% endif %}">CSV</a>
+</div>

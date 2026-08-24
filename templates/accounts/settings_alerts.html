@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}設定（アラート） - 営業機会アラートツール{% endblock %}
+{% block content %}
+<h1>設定</h1>
+{% include "accounts/_settings_tabs.html" with active="alerts" %}
+<div class="card" style="max-width:520px;">
+  <h2>アラート</h2>
+  <form method="post">
+    {% csrf_token %}
+    {% include "_form_fields.html" %}
+    <button type="submit" class="btn">保存</button>
+  </form>
+  <p class="muted" style="margin-top:16px;">
+    スコアが「メール通知する最低スコア」以上の新着情報のみメール通知します。
+    「要チェック」の閾値以上・アラート閾値未満の情報は、ダッシュボード上で確認できます。
+  </p>
+</div>
+{% endblock %}

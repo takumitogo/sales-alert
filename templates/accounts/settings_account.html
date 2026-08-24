@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}設定（アカウント） - 営業機会アラートツール{% endblock %}
+{% block content %}
+<h1>設定</h1>
+{% include "accounts/_settings_tabs.html" with active="account" %}
+<div class="card" style="max-width:520px;">
+  <h2>アカウント</h2>
+  <form method="post">
+    {% csrf_token %}
+    {% include "_form_fields.html" %}
+    <button type="submit" class="btn">保存</button>
+  </form>
+  <p class="muted" style="margin-top:16px;">担当者名・メールアドレスの変更は現在管理者にお問い合わせください（今回のMVPでは未実装）。</p>
+</div>
+{% endblock %}

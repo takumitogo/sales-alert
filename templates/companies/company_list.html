@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}企業一覧 - 営業機会アラートツール{% endblock %}
+{% block content %}
+<h1>監視企業一覧</h1>
+
+<form method="get" class="filters card">
+  <div class="field">
+    <label>企業名検索</label>
+    <input type="text" name="q" value="{{ q }}" placeholder="企業名で検索">
+  </div>
+  <div class="field">
+    <label>区分</label>
+    <select name="category">
+      <option value="">すべて</option>
+      {% for value, label in category_choices %}
+      <option value="{{ value }}" {% if category == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label>監視状態</label>
+    <select name="monitoring">
+      <option value="">すべて</option>
+      <option value="on" {% if monitoring == "on" %}selected{% endif %}>監視ONのみ</option>
+      <option value="off" {% if monitoring == "off" %}selected{% endif %}>監視OFFのみ</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>最新スコア以上</label>
+    <input type="number" name="min_score" value="{{ min_score }}" min="0" max="100" style="width:90px;">
+  </div>
+  <button type="submit" class="btn btn-secondary">絞り込み</button>
+  <a href="{% url 'companies:create' %}" class="btn">＋ 企業を登録</a>
+</form>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr><th>企業名</th><th>区分</th><th>監視</th><th>最新スコア</th><th>最終検知</th><th>最新アラート内容</th></tr>
+    </thead>
+    <tbody>
+      {% for row in page_obj %}
+      <tr>
+        <td><a href="{% url 'companies:detail' row.company.pk %}">{{ row.company.company_name }}</a><br><span class="muted">{{ row.company.domain }}</span></td>
+        <td>{{ row.company.get_category_display }}</td>
+        <td>{% if row.company.monitoring_enabled %}<span class="badge badge-ok">ON</span>{% else %}<span class="badge badge-muted">OFF</span>{% endif %}</td>
+        <td>
+          {% if row.latest_score is not None %}
+            {% if row.latest_score >= 80 %}<span class="badge badge-alert">{{ row.latest_score }}点</span>
+            {% elif row.latest_score >= 60 %}<span class="badge badge-watch">{{ row.latest_score }}点</span>
+            {% else %}<span class="badge badge-muted">{{ row.latest_score }}点</span>{% endif %}
+          {% else %}<span class="muted">-</span>{% endif %}
+        </td>
+        <td>{% if row.latest_detected_at %}{{ row.latest_detected_at|date:"Y-m-d" }}{% else %}<span class="muted">-</span>{% endif %}</td>
+        <td>{{ row.latest_title|default:"-"|truncatechars:30 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6" class="muted">条件に一致する企業がありません。CSVで一括登録するか、企業を登録してください。</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if page_obj.has_other_pages %}
+  <p class="muted" style="margin-top:12px;">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}">前へ</a>{% endif %}
+    ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}">次へ</a>{% endif %}
+  </p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{% if is_create %}企業登録{% else %}企業編集{% endif %} - 営業機会アラートツール{% endblock %}
+{% block content %}
+<div class="card" style="max-width:560px;">
+  <h1>{% if is_create %}企業を登録{% else %}{{ company.company_name }} を編集{% endif %}</h1>
+  <form method="post">
+    {% csrf_token %}
+    {% include "_form_fields.html" %}
+    <button type="submit" class="btn">保存</button>
+    {% if not is_create %}<a href="{% url 'companies:detail' company.pk %}" class="btn btn-secondary">キャンセル</a>{% endif %}
+  </form>
+</div>
+{% endblock %}
