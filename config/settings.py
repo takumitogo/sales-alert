@@ -158,3 +158,23 @@ CRAWLER_REQUEST_TIMEOUT_SECONDS = float(os.environ.get("CRAWLER_REQUEST_TIMEOUT_
 CRAWLER_MAX_RETRIES = int(os.environ.get("CRAWLER_MAX_RETRIES", "2"))
 CRAWLER_CIRCUIT_BREAKER_FAILURES = int(os.environ.get("CRAWLER_CIRCUIT_BREAKER_FAILURES", "5"))
 CRAWLER_BATCH_SIZE = int(os.environ.get("CRAWLER_BATCH_SIZE", "25"))
+
+# --- Logging ---------------------------------------------------------------
+# Djangoの既定設定では DEBUG=False のとき、未処理の例外はコンソールに出力されず
+# (mail_admins向けのみ)、本番のエラー内容がRenderのログから見えなくなってしまう。
+# ここでは常にコンソール（Renderのログに表示される）へ出力するようにする。
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+    },
+}
